@@ -27,8 +27,8 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        * Buscar conteúdo na div conteudo:
-        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    * Buscar conteúdo na div conteudo:
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "lista_user") {
 
         $pesquisa = $_POST['pesq'];
@@ -78,7 +78,7 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Inserir conteúdo dentro da lista de pedidos criada em lista_mod_insert:
+    * Inclusão de usuários:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "inclui_user") {
 
@@ -92,7 +92,7 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * editar conteúdo dentro da lista de pedidos do modal de edição:
+    * Edição de usuários:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "edita_user") {
 
@@ -108,7 +108,7 @@ if (isset($_GET["a"])) {
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Deleta o pedido:
+    * Deleta o usuário:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "del_user") {
 
@@ -120,7 +120,7 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Busca conteúdo para exibir na div de edição do pedido:
+    * Busca conteúdo para exibir na div de edição do usuário:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "get_user") {
 
@@ -235,7 +235,7 @@ include('aside.php');
                             <h2 style="margin: 0"><span class="badge bg-info text-white" style="padding: 8px" id="span_endereco_nome"></span></h2>
                         </div>
                         <div>
-                            <h5 id="div_edit_title"></h5>
+                            <h5 id="div_edit_title">Editar Usuário</h5>
                         </div>
                     </div>
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="location.reload();">X</button>
@@ -302,7 +302,7 @@ include('aside.php');
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * inclui no modal os itens para inclusão:
+     * Inclusão:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     const incluiUsu = () => {
@@ -322,7 +322,7 @@ include('aside.php');
             success: function retorno_ajax(retorno) {
                 //console.log(retorno)
                 if (!retorno) {
-                    alert("ERRO AO INLUIR USUÁRIO!");
+                    alert("ERRO AO INCLUIR USUÁRIO!");
                 }else{
                     $("#mod_formul").modal('hide');
                     lista_itens();
@@ -332,7 +332,7 @@ include('aside.php');
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * permite a edição de itens dentro do pedido:
+     * Edição do usuário:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     const editUsu = (countarray, iditens, idPed) => {
@@ -368,7 +368,7 @@ include('aside.php');
         }
     }
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * Pesquisar itens do campo de edição:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
@@ -403,7 +403,7 @@ include('aside.php');
     }
 
      /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * Excluir pedido:
+     * Excluir usuário:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     function del_item(id) {

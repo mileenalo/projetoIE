@@ -11,22 +11,6 @@ $db = new Database();
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 if (isset($_GET["a"])) {
 
-    function formataCPFouCNPJ($cpf){
-        if ($cpf) {
-            $cpf = trim($cpf);
-            $cpf = str_replace(".", "", $cpf);
-            $cpf = str_replace("-", "", $cpf);
-            $cpf = str_replace("/", "", $cpf);
-    
-            if (strlen($cpf) == 11) {
-                return substr($cpf, 0, 3) . "." . substr($cpf, 3, 3) . "." . substr($cpf, 6, 3) . "-" . substr($cpf, 9, 2);
-            } else {
-                return substr($cpf, 0, 2) . "." . substr($cpf, 2, 3) . "." . substr($cpf, 5, 3) . "/" . substr($cpf, 8, 4) . "-" . substr($cpf, 12, 2);
-            }
-        } else {
-            return '';
-        }
-	}
 
     function remove_acento($string)
     {
@@ -47,7 +31,7 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
         * Buscar conteúdo na div conteudo:
         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "lista_client") {
+    if ($_GET["a"] == "lista_docs") {
 
         $pesquisa = $_POST['pesq'];
         $where = "";
@@ -113,7 +97,7 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Inserir conteúdo dentro da lista de pedidos criada em lista_mod_insert:
+    * Inserir documento na tabela e no diretorio do projeto:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "inclui_doc") {
        
@@ -147,9 +131,9 @@ if (isset($_GET["a"])) {
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Deleta o pedido:
+    * Deleta o documento:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "del_client") {
+    if ($_GET["a"] == "del_doc") {
 
         $id = $_POST["id"];
 
@@ -159,7 +143,7 @@ if (isset($_GET["a"])) {
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * Busca conteúdo para exibir na div de edição do pedido:
+    * Busca conteúdo para exibir na div de edição do documento:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     if ($_GET["a"] == "get_doc") {
 
@@ -190,7 +174,7 @@ if (isset($_GET["a"])) {
         echo $res;
 
     }
-    
+
     die();
 }
 
@@ -296,7 +280,7 @@ include('aside.php');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="$('#mod_formul').modal('hide');">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="OK" onclick="incluiCli();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
+                    <button type="button" class="btn btn-primary" id="OK" onclick="incluiDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
                 </div>
             </div>
         </div>
@@ -313,7 +297,7 @@ include('aside.php');
                             <h2 style="margin: 0"><span class="badge bg-info text-white" style="padding: 8px" id="span_endereco_nome"></span></h2>
                         </div>
                         <div>
-                            <h5 id="div_edit_title">Editar Cliente</h5>
+                            <h5 id="div_edit_title">Editar Documento</h5>
                         </div>
                     </div>
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="location.reload();">X</button>
@@ -322,7 +306,7 @@ include('aside.php');
                     <form id="frm_general_edit" name="frm_general"  class="col">
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label for="frm_val1_insert" class="form-label">Nome:</label>
+                                <label for="frm_val1_insert" class="form-label">Título:</label>
                                 <div class="input-group input-group-outline">
                                     <input id="frm_id_edit" hidden>
                                     <input type="text" class="form-control" id="frm_nome_edit" placeholder="Ex: Maria Luiza">
@@ -363,7 +347,7 @@ include('aside.php');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="location.reload();">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="frm_OK" onclick="editUsu();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
+                    <button type="button" class="btn btn-primary" id="frm_OK" onclick="editDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
                 </div>
             </div>
         </div>
@@ -382,7 +366,7 @@ include('aside.php');
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?a=lista_client',
+            url: '?a=lista_docs',
             type: 'post',
             data: {
                 pesq: $('#input_pesquisa').val()
@@ -397,10 +381,10 @@ include('aside.php');
     }
     
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * inclui no modal os itens para inclusão:
+     * Incluisão de novos documentos do usuário:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
-    const incluiCli = () => {
+    const incluiDoc = () => {
         if (ajax_div) {
             ajax_div.abort();
         }
@@ -425,7 +409,7 @@ include('aside.php');
             success: function retorno_ajax(retorno) {
                 console.log(retorno)
                 if (!retorno) {
-                    alert("ERRO AO INLUIR USUÁRIO!");
+                    alert("ERRO AO INCLUIR DOCUMENTO!");
                 }else{
                     $("#mod_formul").modal('hide');
                     lista_itens();
@@ -435,12 +419,12 @@ include('aside.php');
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * permite a edição de itens dentro do pedido:
+     * Edição de descrições do documento cadastrado:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
-    const editUsu = () => {
+    const editDoc = () => {
 
-        if (confirm("Confirma a edição do cliente?")) {
+        if (confirm("Confirma a edição dos dados do documento?")) {
             if (ajax_div) {
                 ajax_div.abort();
             }
@@ -461,7 +445,7 @@ include('aside.php');
                 },
                 success: function retorno_ajax(retorno) {
                     if (!retorno) {
-                        alert("ERRO AO EDITAR O USUÁRIO!");
+                        alert("ERRO AO EDITAR O DOCUMENTO!");
                     }else{
                         $('#mod_formul_edit').modal("hide");
                         lista_itens();
@@ -471,8 +455,8 @@ include('aside.php');
         }
     }
 
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     * Pesquisar itens do campo de edição:
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * Busca itens para os campo de edição:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     const get_item = (id) => {
@@ -512,14 +496,14 @@ include('aside.php');
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     function del_item(id) {
-        if (confirm("Deseja excluir o cliente?")) {
+        if (confirm("Deseja excluir o documento?")) {
             if (ajax_div) {
                 ajax_div.abort();
             }
             ajax_div = $.ajax({
                 cache: false,
                 async: true,
-                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=del_client',
+                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=del_doc',
                 type: 'post',
                 data: {
                     id: id,
@@ -530,7 +514,7 @@ include('aside.php');
                         location.reload();
                         lista_itens();
                     }else {
-                        alert("ERRO AO DELETAR ITENS! " + retorno);
+                        alert("ERRO AO DELETAR DOCUMENTO! " + retorno);
                     }
                 }
             });
