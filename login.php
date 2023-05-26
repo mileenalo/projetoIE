@@ -27,8 +27,8 @@ if (isset($_GET["a"])) {
 			if(!empty($sel)){		
 				
 				if ($sel[0]["usu_senha"] == $senha) {
-
-					setcookie("idUsuario", md5($sel[0]["usu_id"].date("Ymd")), 0);
+					setcookie("codUsu", md5($sel[0]["usu_id"].date("Ymd")), 0);
+					setcookie("idUsuario", $sel[0]["usu_id"], 0);
 					setcookie("nome", $email, 0);
 					setcookie("senha", $senha, 0);
 

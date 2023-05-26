@@ -11,43 +11,33 @@
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link text-white " href="./grph_estoque.php">
+                <a class="nav-link text-white " href="./home.php">
                     
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">dashboard</i>
                     </div>
                     
-                    <span class="nav-link-text ms-1">Dashboard</span>
+                    <span class="nav-link-text ms-1">Inicial</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white " href="./pedidos.php">
+                <a class="nav-link text-white " href="./documentos.php">
                     
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">table_view</i>
                     </div>
                     
-                    <span class="nav-link-text ms-1">Pedidos</span>
+                    <span class="nav-link-text ms-1">Documentos</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white " href="./produtos.php">
+                <a class="nav-link text-white " href="./favoritos.php">
                     
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">receipt_long</i>
                     </div>
                     
-                    <span class="nav-link-text ms-1">Produtos</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white " href="./clientes.php">
-                    
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">people</i>
-                    </div>
-                    
-                    <span class="nav-link-text ms-1">Clientes</span>
+                    <span class="nav-link-text ms-1">Favoritos</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -58,16 +48,6 @@
                     </div>
                     
                     <span class="nav-link-text ms-1">Usuários</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white " href="./relat_cli_aniversario.php">
-                    
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">notifications</i>
-                    </div>
-                    
-                    <span class="nav-link-text ms-1">Aniversários</span>
                 </a>
             </li>
         </ul>

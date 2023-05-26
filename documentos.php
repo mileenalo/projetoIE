@@ -53,21 +53,26 @@ if (isset($_GET["a"])) {
         $where = "";
 
         if ($pesquisa != "") {
-            $where .= "WHERE cli_name LIKE '%{$pesquisa}%' OR cli_cpf LIKE '%{$pesquisa}%' OR cli_email LIKE '%{$pesquisa}%'";
+            $where .= " AND doc_categoria LIKE '%{$pesquisa}%' OR doc_nivel LIKE '%{$pesquisa}%' OR doc_desc LIKE '%{$pesquisa}%'";
         }
 
-        $res = $db->select("SELECT * FROM tb_clientes
-                                {$where} ORDER BY cli_name");
+        $usuario = $_COOKIE["idUsuario"];
+
+        $res = $db->select("SELECT * FROM tb_documentos
+                            INNER JOIN tb_categorias ON doc_categoria = cat_id
+                            INNER JOIN tb_niveis ON doc_nivel = niv_id
+                                WHERE doc_usucad = {$usuario}
+                                {$where} ORDER BY doc_datacad");
 
         if (count($res) > 0) {
             echo '<table class="table align-items-center mb-0">';
             echo '  <thead>';
             echo '      <tr>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-left">Usuário</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Telefone</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">CPF</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Data Nascimento</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">E-mail</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-left">Documento</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Data do Cadastro</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Categoria</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Nível</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Abrir</th>';
             echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Editar</th>';
             echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Deletar</th>';
             echo '      </tr>';
@@ -76,25 +81,25 @@ if (isset($_GET["a"])) {
             foreach($res as $r){
                 echo '<tr>';
                 echo '  <td class="align-middle text-left">';
-                echo '      <span class="text-secondary text-xs font-weight-bold" style="padding-left:15px;">'.$r["cli_name"].'</span>';
+                echo '      <span class="text-secondary text-xs font-weight-bold" style="padding-left:15px;">'.$r["doc_desc"].'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">('.substr($r["cli_telefone"], 0, 2).')'.substr($r["cli_telefone"], 2, 5).'-'.substr($r["cli_telefone"], 7, 4).'</span>';
+                echo '    <span class="text-secondary text-xs font-weight-bold">'.substr($r["doc_datacad"], 6, 2).'-'.substr($r["doc_datacad"], 4, 2).'-'.substr($r["doc_datacad"], 0, 4).'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">'.formataCPFouCNPJ($r["cli_cpf"]).'</span>';
+                echo '    <span class="text-secondary text-xs font-weight-bold">'.$r["cat_desc"].'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">'.substr($r["cli_dtnasc"], 6, 2). '/' .substr($r["cli_dtnasc"], 4, 2). '/' .substr($r["cli_dtnasc"], 0, 4).'</span>';
+                echo '    <span class="text-secondary text-xs font-weight-bold">'.$r["niv_desc"].'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">'.$r["cli_email"].'</span>';
+                echo '    <span class="text-secondary text-xs font-weight-bold"><a href="'.$r["doc_url"].'" class="open-pdf-modal">Abrir PDF</a></span>';
                 echo '  </td>';
                 echo '  <td class="align-middle">';
-                echo '      <i title="Editar" onclick="get_item(\'' . $r["cli_id"] . '\')" class="fa fa-edit" style="cursor: pointer"></i>';
+                echo '      <i title="Editar" onclick="get_item(\'' . $r["doc_id"] . '\')" class="fa fa-edit" style="cursor: pointer"></i>';
                 echo '  </td>';
                 echo '  <td class="align-middle">';
-                echo '      <i title="Deletar" onclick="del_item(\'' . $r["cli_id"] . '\')" class="fa fa-trash" style="cursor: pointer"></i>';
+                echo '      <i title="Deletar" onclick="del_item(\'' . $r["doc_id"] . '\')" class="fa fa-trash" style="cursor: pointer"></i>';
                 echo '  </td>';
                 echo '</tr>';
             }
@@ -110,57 +115,32 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Inserir conteúdo dentro da lista de pedidos criada em lista_mod_insert:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "inclui_client") {
-
-        $name = $_POST["name"];
-        $email = $_POST["email"];
-        $telefone = str_replace("(", "", $_POST["telefone"]);
-        $telefone = str_replace(")", "", $telefone);
-        $telefone = str_replace("-", "", $telefone);
-        $telefone = str_replace(" ", "", $telefone);
-
-        $cpf = str_replace(".", "", $_POST["cpf"]);
-        $cpf = str_replace("-", "", $cpf);
-        $cpf = str_replace("/", "", $cpf);
-
-        $dataNasc = str_replace("/", "", $_POST["dataNasc"]);
-        $dataNasc = substr($dataNasc, 4, 4) . substr($dataNasc, 2, 2) . substr($dataNasc, 0, 2);
-        
-        $res = $db->_exec("INSERT INTO tb_clientes (cli_name, cli_email, cli_telefone, cli_cpf, cli_dtnasc) 
-                            VALUES ('{$name}','{$email}','{$telefone}', '{$cpf}', '{$dataNasc}')");
-
-        echo $res;
-    }
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    * editar conteúdo dentro da lista de pedidos do modal de edição:
-    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "edita_client") {
-
-        $id = $_POST["id"];
-        $name = $_POST["name"];
-        $email = $_POST["email"];
-        $telefone = $_POST["telefone"];
-        $cpf = $_POST["cpf"];
-        $dataNasc = $_POST["dataNasc"];
+    if ($_GET["a"] == "inclui_doc") {
        
-        $telefone = str_replace("(", "", $_POST["telefone"]);
-        $telefone = str_replace(")", "", $telefone);
-        $telefone = str_replace("-", "", $telefone);
-        $telefone = str_replace(" ", "", $telefone);
+        if ($_FILES['doc']['error'] === UPLOAD_ERR_OK) {
+            $destination_path = getcwd().DIRECTORY_SEPARATOR;
+            $nomeArquivo = $_FILES['doc']['name'];
+            $caminhoTemporario = $_FILES['doc']['tmp_name'];
 
-        $cpf = str_replace(".", "", $_POST["cpf"]);
-        $cpf = str_replace("-", "", $cpf);
-        $cpf = str_replace("/", "", $cpf);
+            $caminhoDestino = "./arquivos/". $nomeArquivo;
 
-        $dataNasc = str_replace("/", "", $_POST["dataNasc"]);
-        $dataNasc = substr($dataNasc, 4, 4) . substr($dataNasc, 2, 2) . substr($dataNasc, 0, 2);
+            if(@move_uploaded_file($caminhoTemporario, $caminhoDestino)) {
+                echo 'Arquivo enviado e salvo com sucesso.';
+            }else{
+                echo 'Erro ao salvar o arquivo.';
+            }
+        }else{
+            echo 'Ocorreu um erro durante o envio do arquivo.';
+        }
+        
+        $usuario = $_COOKIE["idUsuario"];
+        $desc = $_POST["name"];
+        $categ = $_POST["categ"];
+        $nivel = $_POST["nivel"];
+        $datacad = date("Ymd");
 
-        $res = $db->_exec("UPDATE tb_clientes 
-                            SET cli_name = '{$name}', cli_email = '{$email}', 
-                            cli_telefone = '{$telefone}', cli_cpf = '{$cpf}', 
-                            cli_dtnasc = '{$dataNasc}' 
-                        WHERE cli_id = $id");
+        $res = $db->_exec("INSERT INTO tb_documentos (doc_url, doc_categoria, doc_nivel, doc_desc, doc_usu, doc_datacad) 
+                            VALUES ('{$caminhoDestino}', {$categ}, {$nivel}, '{$desc}', {$usuario}, '{$datacad}')");
 
         echo $res;
     }
@@ -173,7 +153,7 @@ if (isset($_GET["a"])) {
 
         $id = $_POST["id"];
 
-        $del = $db->_exec("DELETE FROM tb_clientes WHERE cli_id = {$id}");
+        $del = $db->_exec("DELETE FROM tb_documentos WHERE doc_id = {$id}");
 
         echo $del;
     }
@@ -181,25 +161,36 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Busca conteúdo para exibir na div de edição do pedido:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "get_client") {
+    if ($_GET["a"] == "get_doc") {
 
 
         $id = $_POST["id"];
 
-        $res = $db->select("SELECT * FROM tb_clientes 
-                            WHERE cli_id = {$id}");
-
-        if (count($res) > 0) {
-            $res[0]['cli_name'] = utf8_decode($res[0]['cli_name']);
-            $res[0]['cli_dtnasc'] = substr($res[0]["cli_dtnasc"], 6, 2). '/' .substr($res[0]["cli_dtnasc"], 4, 2). '/' .substr($res[0]["cli_dtnasc"], 0, 4);
-            $res[0]['cli_cpf'] = formataCPFouCNPJ($res[0]["cli_cpf"]);
-            $res[0]['cli_telefone'] = '(' . substr($res[0]["cli_telefone"], 0, 2) . ')' . substr($res[0]["cli_telefone"], 2, 5) . '-' . substr($res[0]["cli_telefone"], 7, 4);
-            
-        }
+        $res = $db->select("SELECT doc_id, doc_categoria, doc_nivel, doc_desc, doc_usu, doc_datacad FROM tb_documentos 
+                            WHERE doc_id = {$id}");
 
         echo json_encode($res);
     }
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    * Edita informações do documento:
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    if($_GET["a"] == "edita_doc"){
+
+        $id = $_POST["id"];
+        $desc = $_POST["name"];
+        $categ = $_POST["categ"];
+        $nivel = $_POST["nivel"];
+        $datacad = date("Ymd");
+
+        $res = $db->_exec("UPDATE tb_documentos SET doc_categoria = {$categ}, doc_nivel = {$nivel}, 
+                                doc_desc = '{$desc}', doc_datacad = '{$datacad}'
+                            WHERE doc_id = {$id}");
+
+        echo $res;
+
+    }
+    
     die();
 }
 
@@ -256,40 +247,48 @@ include('aside.php');
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="$('#mod_formul').modal('hide');">X</button>
                 </div>
                 <div class="modal-body modal-dialog-scrollable">
-                    <form id="frm_general" name="frm_general" class="col">
+                    <form id="frm_general" name="frm_general" class="col" enctype="multipart/form-data">
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label for="frm_val1_insert" class="form-label">Nome:</label>
+                                <label for="frm_val1_insert" class="form-label">Título:</label>
                                 <div class="input-group input-group-outline">
                                     <input type="text" class="form-control" id="frm_nome" placeholder="Ex: Maria Luiza">
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label for="frm_val2_insert" class="form-label">CPF/CNPJ:</label>
+                                <label for="frm_categ" class="form-label">Categoria:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_cpf" placeholder="Ex: XXX.XXX.XXX-XX">
+                                    <select id="frm_categ" class="form-control form-control-lg" style="width:100%" name="frm_categ" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT cat_id, cat_desc FROM tb_categorias ORDER BY cat_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["cat_id"].'">'.$s["cat_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label for="frm_val1_insert" class="form-label">Telefone:</label>
+                                <label for="frm_nivel" class="form-label">Nível:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_telefone" placeholder="(XX)XXXXX-XXXX">
+                                    <select id="frm_nivel" class="form-control form-control-lg" style="width:100%" name="frm_nivel" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT niv_id, niv_desc FROM tb_niveis ORDER BY niv_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["niv_id"].'">'.$s["niv_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label for="frm_val2_insert" class="form-label">Data nascimento:</label>
+                                <label for="frm_val2_insert" class="form-label">Upload:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_dtNasc" placeholder="Ex: dd/mm/aaaa">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="frm_val1_insert" class="form-label">Email:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_email" placeholder="Ex: teste@gmail.com">
+                                    <input type="file" class="form-control" id="frm_doc"  placeholder="Ex: material.pdf">
                                 </div>
                             </div>
                         </div>
@@ -320,7 +319,7 @@ include('aside.php');
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="location.reload();">X</button>
                 </div>
                 <div class="modal-body modal-dialog-scrollable">
-                <form id="frm_general" name="frm_general" class="col">
+                    <form id="frm_general_edit" name="frm_general"  class="col">
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label for="frm_val1_insert" class="form-label">Nome:</label>
@@ -330,31 +329,33 @@ include('aside.php');
                                 </div>
                             </div>
                             <div class="col-6">
-                                <label for="frm_val2_insert" class="form-label">CPF/CNPJ:</label>
+                                <label for="frm_categ" class="form-label">Categoria:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_cpf_edit" placeholder="Ex: XXX.XXX.XXX-XX">
+                                    <select id="frm_categ_edit" class="form-control form-control-lg" style="width:100%" name="frm_categ_edit" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT cat_id, cat_desc FROM tb_categorias ORDER BY cat_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["cat_id"].'">'.$s["cat_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label for="frm_val1_insert" class="form-label">Telefone:</label>
+                                <label for="frm_nivel_edit" class="form-label">Nível:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_telefone_edit" placeholder="(XX)XXXXX-XXXX">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label for="frm_val2_insert" class="form-label">Data nascimento:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_dtNasc_edit" placeholder="Ex: dd/mm/aaaa">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="frm_val1_insert" class="form-label">Email:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_email_edit" placeholder="Ex: teste@gmail.com">
+                                    <select id="frm_nivel_edit" class="form-control form-control-lg" style="width:100%" name="frm_nivel_edit" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT niv_id, niv_desc FROM tb_niveis ORDER BY niv_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["niv_id"].'">'.$s["niv_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
                                 </div>
                             </div>
                         </div>
@@ -368,7 +369,6 @@ include('aside.php');
         </div>
     </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
 <script type="text/javascript">
    
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -391,12 +391,11 @@ include('aside.php');
                 $('#div_conteudo').html('<div class="spinner-grow m-3 text-primary" role="status"><span class="visually-hidden">Aguarde...</span></div>');
             },
             success: function retorno_ajax(retorno) {
-                //console.log(retorno);
                 $('#div_conteudo').html(retorno);
             }
         });
     }
-
+    
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * inclui no modal os itens para inclusão:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -405,18 +404,24 @@ include('aside.php');
         if (ajax_div) {
             ajax_div.abort();
         }
+       
+        var doc = $('#frm_doc')[0].files[0];
+    
+        var formData = new FormData();
+        
+        formData.append('doc', doc,);
+        formData.append('name', $("#frm_nome").val());
+        formData.append('categ', $("#frm_categ").val());
+        formData.append('nivel', $("#frm_nivel").val());
+
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?a=inclui_client',
+            url: '?a=inclui_doc',
             type: 'post',
-            data: {
-                name: $("#frm_nome").val(),
-                email: $("#frm_email").val(),
-                cpf: $("#frm_cpf").val(),
-                dataNasc: $("#frm_dtNasc").val(),
-                telefone: $("#frm_telefone").val(),
-            },
+            data: formData,
+            contentType: false, 
+            processData: false,
             success: function retorno_ajax(retorno) {
                 console.log(retorno)
                 if (!retorno) {
@@ -433,7 +438,7 @@ include('aside.php');
      * permite a edição de itens dentro do pedido:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
-    const editUsu = (countarray, iditens, idPed) => {
+    const editUsu = () => {
 
         if (confirm("Confirma a edição do cliente?")) {
             if (ajax_div) {
@@ -443,14 +448,12 @@ include('aside.php');
             ajax_div = $.ajax({
                 cache: false,
                 async: true,
-                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=edita_client',
+                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=edita_doc',
                 type: 'post',
                 data: {
                     name: $("#frm_nome_edit").val(),
-                    email: $("#frm_email_edit").val(),
-                    cpf: $("#frm_cpf_edit").val(),
-                    dataNasc: $("#frm_dtNasc_edit").val(),
-                    telefone: $("#frm_telefone_edit").val(),
+                    categ: $("#frm_categ_edit").val(),
+                    nivel: $("#frm_nivel_edit").val(),
                     id: $('#frm_id_edit').val(),
                 },
                 beforeSend: function() {
@@ -479,7 +482,7 @@ include('aside.php');
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=get_client',
+            url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=get_doc',
             type: 'post',
             data: {
                 id: id,
@@ -488,17 +491,17 @@ include('aside.php');
                 $('#mod_formul_edit').modal("show");
             },
             success: function retorno_ajax(retorno) {
+                console.log(retorno);
                 var obj = JSON.parse(retorno);
                 
                 console.log(id);
 
                 $("#frm_id_edit").val(id);
 
-                $("#frm_nome_edit").val(obj[0].cli_name);
-                $("#frm_email_edit").val(obj[0].cli_email);
-                $("#frm_cpf_edit").val(obj[0].cli_cpf);
-                $("#frm_dtNasc_edit").val(obj[0].cli_dtnasc);
-                $("#frm_telefone_edit").val(obj[0].cli_telefone);
+                $("#frm_nome_edit").val(obj[0].doc_desc);
+                $("#frm_categ_edit").val(obj[0].doc_categoria);
+                $("#frm_nivel_edit").val(obj[0].doc_nivel);
+                $("#frm_doc_edit").val("");
 
             }
         });
@@ -539,12 +542,6 @@ include('aside.php');
     // Evento inicial:
     $(document).ready(function() {
         lista_itens();
-        $('#frm_telefone_edit').mask('(00) 0 0000-0000');
-        $('#frm_telefone').mask('(00) 0 0000-0000');
-        $('#frm_dtNasc').mask('00/00/0000');
-        $('#frm_dtNasc_edit').mask('00/00/0000');
-		$('#frm_cpf').mask('000.000.000-00');
-		$('#frm_cpf_edit').mask('000.000.000-00');
     });
 
 </script>
