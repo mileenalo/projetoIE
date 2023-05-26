@@ -189,7 +189,7 @@ include('aside.php');
             <div class="col-12">
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3" style="background:#DA522B;">
                             <h6 class="text-white text-capitalize ps-3">Cadastro de Documentos</h6>
                         </div>
                     </div>
@@ -203,7 +203,7 @@ include('aside.php');
                             </div>
                             <div class="col-2">
                                 <div class="input-group">
-                                    <button type="button" onclick="$('#mod_formul').modal('show');" class="btn bg-gradient-primary" style="height: 38px"><i class="mdi mdi-library-plus" style="margin-right: 5px"></i>Incluir</button>
+                                    <button type="button" onclick="$('#mod_formul').modal('show');" class="btn bg-gradient-primary" style="height: 38px; background:#DA522B;"><i class="mdi mdi-library-plus" style="margin-right: 5px"></i>Incluir</button>
                                 </div>
                             </div>
                         </div>
@@ -280,7 +280,7 @@ include('aside.php');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="$('#mod_formul').modal('hide');">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="OK" onclick="incluiDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
+                    <button type="button" class="btn btn-primary" style="background:#DA522B;" id="OK" onclick="incluiDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
                 </div>
             </div>
         </div>
@@ -347,7 +347,7 @@ include('aside.php');
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="location.reload();">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="frm_OK" onclick="editDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
+                    <button type="button" class="btn btn-primary" style="background:#DA522B;" id="frm_OK" onclick="editDoc();"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">OK</button>
                 </div>
             </div>
         </div>
