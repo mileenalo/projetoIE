@@ -22,13 +22,14 @@ if (isset($_GET["a"])) {
 			echo '</div>';
 		}else{
 
-			$sel = $db->select("SELECT usu_id, usu_nome, usu_senha FROM tb_usuarios WHERE usu_email = '$email'");
+			$sel = $db->select("SELECT usu_id, usu_nome, usu_senha, usu_permissao FROM tb_usuarios WHERE usu_email = '$email'");
 
 			if(!empty($sel)){		
 				
 				if ($sel[0]["usu_senha"] == $senha) {
 					setcookie("codUsu", md5($sel[0]["usu_id"].date("Ymd")), 0);
 					setcookie("idUsuario", $sel[0]["usu_id"], 0);
+					setcookie("permissao", $sel[0]["usu_permissao"], 0);
 					setcookie("nome", $email, 0);
 					setcookie("senha", $senha, 0);
 
@@ -123,7 +124,7 @@ include("header.php");
 			success: function retorno_ajax(retorno) {
 				console.log(retorno);
 				if(retorno == 1){
-					document.location.href="./pedidos.php?uid=<?php echo $_COOKIE['idUsuario']; ?>";
+					document.location.href="./home.php?uid=<?php echo $_COOKIE['idUsuario']; ?>";
 				}else{
 					alert("ERRO! " + retorno);
 				}

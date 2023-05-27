@@ -40,6 +40,7 @@
                     <span class="nav-link-text ms-1">Favoritos</span>
                 </a>
             </li>
+            <?php if($_COOKIE["permissao"] == '1') : ?>
             <li class="nav-item">
                 <a class="nav-link text-white " href="./usuarios.php">
                     
@@ -50,6 +51,7 @@
                     <span class="nav-link-text ms-1">Usuários</span>
                 </a>
             </li>
+            <?php endif; ?>
         </ul>
     </div>
 </aside>

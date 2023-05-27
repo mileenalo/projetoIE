@@ -85,8 +85,9 @@ if (isset($_GET["a"])) {
         $name = $_POST["name"];
         $email = $_POST["email"];
         $password = md5($_POST["password"]);
-
-        $res = $db->_exec("INSERT INTO tb_usuarios (usu_nome, usu_email, usu_senha) VALUES ('{$name}','{$email}','{$password}')");
+        $permi = $_POST["permi"];
+        
+        $res = $db->_exec("INSERT INTO tb_usuarios (usu_nome, usu_email, usu_senha, usu_permissao) VALUES ('{$name}','{$email}','{$password}', {$permi})");
 
         echo $res;
     }
@@ -99,9 +100,10 @@ if (isset($_GET["a"])) {
         $id = $_POST["id"];
         $name = $_POST["name"];
         $email = $_POST["email"];
+        $permi = $_POST["permi"];
         $password = md5($_POST["password"]);
 
-        $res = $db->_exec("UPDATE tb_usuarios SET usu_nome = '{$name}', usu_email = '{$email}', usu_senha = '$password' WHERE usu_id = $id");
+        $res = $db->_exec("UPDATE tb_usuarios SET usu_nome = '{$name}', usu_email = '{$email}', usu_senha = '$password', usu_permissao = {$permi} WHERE usu_id = $id");
 
         echo $res;
     }
@@ -213,6 +215,15 @@ include('aside.php');
                                     <input type="password" class="form-control" id="frm_password" placeholder="*****">
                                 </div>
                             </div>
+                            <div class="col-4">
+                                <label for="frm_val2_insert" class="form-label">Permissão:</label>
+                                <div class="input-group input-group-outline">
+                                    <select id="fil_permi" class="form-control form-control-lg" style="width:100%" name="fil_permi" type="text">
+								        <option value="1" selected>Administrador</option>
+                                        <option value="2">Usuário</option>
+							        </select>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -260,6 +271,15 @@ include('aside.php');
                                 <label for="frm_val2_insert" class="form-label">Senha:</label>
                                 <div class="input-group input-group-outline">
                                     <input type="password" class="form-control" id="frm_password_edit" placeholder="*****">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <label for="frm_val2_insert" class="form-label">Permissão:</label>
+                                <div class="input-group input-group-outline">
+                                    <select id="fil_permi_edit" class="form-control form-control-lg" style="width:100%" name="fil_permi_edit" type="text">
+								        <option value="1" selected>Administrador</option>
+                                        <option value="2">Usuário</option>
+							        </select>
                                 </div>
                             </div>
                         </div>
@@ -318,6 +338,7 @@ include('aside.php');
                 name: $("#frm_nome").val(),
                 email: $("#frm_email").val(),
                 password: $("#frm_password").val(),
+                permi: $("#fil_permi").val(),
             },
             success: function retorno_ajax(retorno) {
                 //console.log(retorno)
@@ -351,6 +372,7 @@ include('aside.php');
                     name: $('#frm_nome_edit').val(),
                     email: $('#frm_email_edit').val(),
                     password: $('#frm_password_edit').val(),
+                    permi: $("#fil_permi_edit").val(),
                     id: $('#frm_id_edit').val(),
                 },
                 beforeSend: function() {
@@ -396,6 +418,7 @@ include('aside.php');
 
                 $("#frm_nome_edit").val(obj[0].usu_nome);
                 $("#frm_email_edit").val(obj[0].usu_email);
+                $("#fil_permi_edit").val(obj[0].usu_permissao);
                 //$("#frm_password_edit").val(obj_ret[0].idUsuario);
 
             }
