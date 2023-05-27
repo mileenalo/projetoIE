@@ -77,7 +77,7 @@ if (isset($_GET["a"])) {
                 echo '    <span class="text-secondary text-xs font-weight-bold">'.$r["niv_desc"].'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold"><a href="'.$r["doc_url"].'" class="open-pdf-modal">Abrir PDF</a></span>';
+                echo '      <i title="Visuzalizar" onclick="viewDoc(\''.$r["doc_url"].'\');" class="fa fa-eye" style="cursor: pointer"></i>';
                 echo '  </td>';
                 echo '  <td class="align-middle">';
                 echo '      <i title="Editar" onclick="get_item(\'' . $r["doc_id"] . '\')" class="fa fa-edit" style="cursor: pointer"></i>';
@@ -353,6 +353,38 @@ include('aside.php');
         </div>
     </div>
 
+    <div class="modal" id="mod_vis">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" style="max-width: 50%;">
+            <div class="modal-content">
+                <div class="modal-header" style="align-items: center">
+                    <div style="display: flex; align-items: center">
+                        <div style="margin-right: 5px">
+                            <h2 style="margin: 0"><span class="badge bg-info text-white" style="padding: 8px"></span></h2>
+                        </div>
+                        <div>
+                            <h5 id="tit_frm_formul_" class="modal-title">Visualizador</h5>
+                        </div>
+                    </div>
+                    <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="$('#mod_vis').modal('hide');">X</button>
+                </div>
+                <div class="modal-body">
+                    <div id="documentViewer" class="flowpaper_viewer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" style="background:#DA522B;" id="OK" onclick="$('#mod_vis').modal('hide');"><img id="img_btn_close" style="width: 15px; display: none; margin-right: 10px">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<link rel="stylesheet" type="text/css" href="./assets/flowPaper/css/flowpaper.css" />
+<script type="text/javascript" src="./assets/flowPaper/js/jquery.min.js"></script>
+<script type="text/javascript" src="./assets/flowPaper/js/jquery.extensions.min.js"></script>
+<!--[if gte IE 10 | !IE ]><!-->
+<script type="text/javascript" src="./assets/flowPaper/js/three.min.js"></script>
+<!--<![endif]-->
+<script type="text/javascript" src="./assets/flowPaper/js/flowpaper.js"></script>
+<script type="text/javascript" src="./assets/flowPaper/js/flowpaper_handlers.js"></script>
 <script type="text/javascript">
    
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -523,6 +555,20 @@ include('aside.php');
         }
     }
     
+    function viewDoc(doc){
+        $("#mod_vis").modal("show");
+        $('#documentViewer').FlowPaperViewer({
+            config: {
+                PDFFile: doc,
+                Scale: 1.0, // Escala inicial do documento (opcional)
+                ZoomTransition: 'easeOut', // Transição de zoom (opcional)
+                UIConfig    : './assets/flowPaper/UI_Zine.xml',
+                ViewModeToolsVisible: false // Exibir as ferramentas de visualização (opcional)
+                // Outras opções de configuração podem ser adicionadas conforme necessário
+            }
+        });
+    }
+
     // Evento inicial:
     $(document).ready(function() {
         lista_itens();

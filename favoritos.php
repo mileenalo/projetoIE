@@ -33,17 +33,31 @@ if (isset($_GET["a"])) {
     if ($_GET["a"] == "lista_docs") {
 
         $pesquisa = $_POST['pesq'];
+        $categ = $_POST['categ'];
+        $nivel = $_POST['nivel'];
+
         $where = "";
+        $whereCat = "";
+        $whereNiv = "";
 
         if ($pesquisa != "") {
-            $where .= " WHERE doc_categoria LIKE '%{$pesquisa}%' OR doc_nivel LIKE '%{$pesquisa}%' OR doc_desc LIKE '%{$pesquisa}%'";
+            $where .= " WHERE doc_desc LIKE '%{$pesquisa}%'";
+        }
+
+        if ($categ != "") {
+            $whereCat .= " AND  cat_id = {$categ}";
+        }
+
+        if ($nivel != "") {
+            $whereNiv .= " AND niv_id = {$nivel}";
         }
 
         $usuario = $_COOKIE["idUsuario"];
 
         $res = $db->select("SELECT * FROM tb_documentos
-                            INNER JOIN tb_categorias ON doc_categoria = cat_id
-                            INNER JOIN tb_niveis ON doc_nivel = niv_id
+                            INNER JOIN tb_categorias ON doc_categoria = cat_id {$whereCat}
+                            INNER JOIN tb_niveis ON doc_nivel = niv_id {$whereNiv}
+                            INNER JOIN tb_favoritos ON doc_id = fav_documento AND fav_usu = {$usuario}
                                 {$where} ORDER BY doc_datacad");
         
         if (count($res) > 0) {
@@ -52,16 +66,28 @@ if (isset($_GET["a"])) {
             echo    '<div class="container">';
             echo        '<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">';
             foreach($res as $r){
+                if($r["fav_id"] == null){
+                    $style = '';
+                    $val = $r["doc_id"];
+                    $type = 2;
+                }else{
+                    $style = 'style="background:#DE5B98; color:#ffffff; "';
+                    $val = $r["fav_id"];
+                    $type = 1;
+                    
+                }
+
                 echo            '<div class="col">';
                 echo                '<div class="card shadow-sm">';
-                echo                    '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="./assets/img/down-arrow-dark.svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Arquivo</text></svg>';
+                echo                    '<svg class="bd-placeholder-img card-img-top" width="100%" xmlns="./assets/img/down-arrow-dark.svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><img src="./assets/img/unnamed.png" style="opacity: 0.5;" class="navbar-brand-img h-50" alt="main_logo"></svg>';
                 echo                    '<div class="card-body">';
-                echo                        '<p class="card-text">'.$r["doc_desc"].'</p>';
+                echo                        '<p class="card-text"><b>'.$r["doc_desc"].'</b></p>';
                 echo                        '<div class="d-flex justify-content-between align-items-center">';
                 echo                            '<div class="btn-group">';
-                echo                                '<button type="button" class="btn btn-sm btn-outline-secondary">View</button>';
+                echo                                '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="viewDoc(\''.$r["doc_url"].'\');">View</button>';
+                echo                                '<button type="button" '.$style.' class="btn btn-sm btn-outline-secondary" onclick="favDoc(\''.$val.'\', \''.$type.'\');">Favoritos</button>';
                 echo                            '</div>';
-                echo                            '<small class="text-body-secondary">Última Alteração: '.substr($r["doc_datacad"], 6, 2).'/'.substr($r["doc_datacad"], 4, 2).'/'.substr($r["doc_datacad"], 0, 4).'</small>';
+                echo                            '<small class="text-body-secondary" style="padding-left: 15px;">Última Alteração: '.substr($r["doc_datacad"], 6, 2).'/'.substr($r["doc_datacad"], 4, 2).'/'.substr($r["doc_datacad"], 0, 4).'</small>';
                 echo                        '</div>';
                 echo                    '</div>';
                 echo                '</div>';
@@ -99,9 +125,44 @@ include('aside.php');
                     
                     <div class="card-body px-0 pb-2">
                         <div class="form-group row" style="padding-left:15px;">
-                            <div class="col-10">
+                            <div class="col-6">
+                                <label>Pesquisar</label>
                                 <div class="input-group input-group-outline">
                                     <input type="text" class="form-control" onkeyup="lista_itens()" id="input_pesquisa" placeholder="Pesquisar">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <label>Categorias</label>
+                                <div class="input-group input-group-outline">
+                                    <select id="fil_categ" class="form-control form-control-lg" style="width:100%" name="fil_categ" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT cat_id, cat_desc FROM tb_categorias ORDER BY cat_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["cat_id"].'">'.$s["cat_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <label>Nível</label>
+                                <div class="input-group input-group-outline">
+                                    <select id="fil_nivel" class="form-control form-control-lg" style="width:100%" name="fil_nivel" type="text">
+								        <option value="" selected></option>
+								        <?php
+                                            $desc = $db->select("SELECT niv_id, niv_desc FROM tb_niveis ORDER BY niv_desc");
+                                            foreach($desc as $s){
+                                                echo  '<option value="'.$s["niv_id"].'">'.$s["niv_desc"].'</option>';
+                                            }
+								        ?>
+							        </select>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <label> </label>
+                                <div class="input-group" style="padding-top: 8px;">
+                                    <button type="button" onclick="lista_itens();" class="btn bg-gradient-primary" style="height: 39px; background:#DA522B;"><i class="mdi mdi-library-plus" style="margin-right: 5px"></i>Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +190,9 @@ include('aside.php');
             url: '?a=lista_docs',
             type: 'post',
             data: {
-                pesq: $('#input_pesquisa').val()
+                pesq: $('#input_pesquisa').val(), 
+                categ: $("#fil_categ").val(),
+                nivel: $("#fil_nivel").val(),
             },
             beforeSend: function() {
                 $('#div_conteudo').html('<div class="spinner-grow m-3 text-primary" role="status"><span class="visually-hidden">Aguarde...</span></div>');
@@ -140,6 +203,29 @@ include('aside.php');
         });
     }
     
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * Favoritar itens:
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    var ajax_div = $.ajax(null);
+    const favDoc = (doc, type) => {
+        if (ajax_div) {
+            ajax_div.abort();
+        }
+        ajax_div = $.ajax({
+            cache: false,
+            async: true,
+            url: 'home.php?a=fav_docs',
+            type: 'post',
+            data: {
+                doc: doc,
+                type: type,
+            },
+            success: function retorno_ajax(retorno) {
+                lista_itens();
+            }
+        });
+    }
+
     // Evento inicial:
     $(document).ready(function() {
         lista_itens();
