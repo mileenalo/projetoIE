@@ -141,7 +141,7 @@ include('aside.php');
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                         <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3" style="background:#DA522B;">
-                            <h6 class="text-white text-capitalize ps-3">Cadastro de Documentos</h6>
+                            <h6 class="text-white text-capitalize ps-3">Documentos</h6>
                         </div>
                     </div>
                     
@@ -212,8 +212,10 @@ include('aside.php');
             </div>
             <div class="modal-body">
                 <div id="documentViewer" class="flowpaper_viewer"></div>
+                <input type="text" id="frm_path_doc" hidden>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secundary" id="download" onclick="baixarArquivoPDF();"><img id="img_btn_download" style="width: 15px; display: none; margin-right: 10px">Baixar</button>
                 <button type="button" class="btn btn-primary" style="background:#DA522B;" id="OK" onclick="$('#mod_formul').modal('hide');"><img id="img_btn_ok" style="width: 15px; display: none; margin-right: 10px">Fechar</button>
             </div>
         </div>
@@ -258,8 +260,8 @@ include('aside.php');
     }
     
     function viewDoc(doc){
-        console.log(doc);
         $("#mod_formul").modal("show");
+        $("#frm_path_doc").val(doc);
         $('#documentViewer').FlowPaperViewer({
             config: {
                 PDFFile: doc,
@@ -270,6 +272,19 @@ include('aside.php');
                 // Outras opções de configuração podem ser adicionadas conforme necessário
             }
         });
+    }
+
+    function baixarArquivoPDF() {
+        var doc = $("#frm_path_doc").val();
+
+        var urlArquivoPDF = doc;
+        var nomeArquivo = "file_.pdf"; // O nome que deseja dar ao arquivo baixado
+
+        var link = document.createElement("a");
+        link.href = urlArquivoPDF;
+        link.download = nomeArquivo;
+
+        link.dispatchEvent(new MouseEvent("click"));
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

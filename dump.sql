@@ -25,3 +25,5 @@ insert into tb_categorias(cat_desc) VALUES ('Cálculo');
 insert into tb_niveis(niv_desc) VALUES ('Fundamental');
 insert into tb_niveis(niv_desc) VALUES ('Médio');
 insert into tb_niveis(niv_desc) VALUES ('Superior');
+
+-- Login: milena@compassio.com.br senha: teste123

@@ -11,41 +11,48 @@ if (isset($_GET["a"])) {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	* Edita conteúdo:
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	if ($_GET["a"] == "logar") {
+	if ($_GET["a"] == "cadastrar") {
 		
-		$email = $_POST["email"];
-		$senha = md5($_POST["senha"]);
+		$nome = $_POST["nome"];
+        $email = $_POST["email"];
+        $senha = md5($_POST["senha"]);
+		$cfmsenha = md5($_POST["cfmsenha"]);
 		
-		if($email == "" || $senha == ""){
+		if($email == "" || $senha == "" || $nome == "" || $cfmsenha == ""){
 			echo '<div class="alert alert-warning" role="alert">';
-				echo 'O campo email ou senha se encontra vazio!';
+				echo 'Todos os campos devem ser preenchidos!';
 			echo '</div>';
 		}else{
 
 			$sel = $db->select("SELECT usu_id, usu_nome, usu_senha, usu_permissao FROM tb_usuarios WHERE usu_email = '$email'");
 
 			if(!empty($sel)){		
-				
-				if ($sel[0]["usu_senha"] == $senha) {
-					setcookie("codUsu", md5($sel[0]["usu_id"].date("Ymd")), 0);
-					setcookie("idUsuario", $sel[0]["usu_id"], 0);
-					setcookie("permissao", $sel[0]["usu_permissao"], 0);
-					setcookie("nome", $email, 0);
-					setcookie("senha", $senha, 0);
-
-					$res["success"] = $_COOKIE["codUsu"];
-					echo json_encode($res);
-
-				}else{
-					$res["error"] = 'Senha Incorreta!';
-					echo json_encode($res);
-				}
-			}else{
-				$res["error"] = 'Não há registro desse email de Usuario!';
+				$res["error"] = 'E-mail já cadastrado! Faça login!';
 				echo json_encode($res);
+
+			}else{
+				$sel2 = $db->_exec("INSERT INTO tb_usuarios (usu_nome, usu_email, usu_senha, usu_permissao) VALUES ('{$nome}', '{$email}', '{$senha}', 2)");
+            
+                $sel3 = $db->select("SELECT usu_id, usu_nome, usu_senha, usu_permissao FROM tb_usuarios WHERE usu_email = '{$email}'");
+                
+                if(!empty($sel3)){
+                    setcookie("codUsu", md5($sel3[0]["usu_id"].date("Ymd")), 0);
+                    setcookie("idUsuario", $sel3[0]["usu_id"], 0);
+                    setcookie("permissao", $sel3[0]["usu_permissao"], 0);
+                    setcookie("nome", $email, 0);
+                    setcookie("senha", $senha, 0);
+
+                    $res["success"] = $_COOKIE["codUsu"];
+
+                    echo json_encode($res);
+                }else{
+                    $res["error"] = 'Não não foi possível cadastrar usuário!';
+                    echo json_encode($res);
+                }
 			}
 
-		}
+            
+        }
 	}
 
 	die();
@@ -65,25 +72,33 @@ include("header.php");
             			<div class="card z-index-0 fadeIn3 fadeInBottom">
               				<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 				<div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1" style="background:#DA522B;">
-                  					<h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Entrar</h4>
+                  					<h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Cadastro</h4>
                 				</div>
               				</div>
               			<div class="card-body">
                 			<form role="form" class="text-start">
-                  				<div class="input-group input-group-outline my-3">
+                            <div class="input-group input-group-outline my-3">
+                    				<label class="form-label">Nome</label>
+                    				<input type="text" class="form-control" id="frm_nome" required>
+                  				</div>
+                                  <div class="input-group input-group-outline my-3">
                     				<label class="form-label">Email</label>
-                    				<input type="email" class="form-control" id="frm_email">
+                    				<input type="email" class="form-control" id="frm_email" required>
+                  				</div>
+                  				<div class="input-group input-group-outline my-3">
+                    				<label class="form-label">Senha</label>
+                    				<input type="password" class="form-control" id="frm_password" required>
                   				</div>
                   				<div class="input-group input-group-outline mb-3">
-                    				<label class="form-label">Senha</label>
-                    				<input type="password" class="form-control" id="frm_password">
+                    				<label class="form-label">Confirme a Senha</label>
+                    				<input type="password" class="form-control" id="frm_cfm_password" onkeydown="validSenha();" onchange="validSenha();" required>
                   				</div>
                   				<div class="text-center">
-                    				<button type="button" class="btn bg-gradient-primary w-100 my-4 mb-2" style="background:#DA522B;" onclick="logar();">Entrar</button>
+                    				<button type="button" class="btn bg-gradient-primary w-100 my-4 mb-2" style="background:#DA522B;" id="btn_cad" onclick="cadastro();">Cadastrar</button>
                   				</div>
                   				<p class="mt-4 text-sm text-center">
-                    				Não tem cadastro?
-                    				<a href="new_user.php" class="text-primary text-gradient font-weight-bold" style="color:#DA522B;">Cadastre agora!</a>
+                    				Já tem conta?
+                    				<a style="color:#DA522B;" href="login.php" class="text-primary text-gradient font-weight-bold">Faça login!</a>
                   				</p>
                 			</form>
               			</div>
@@ -111,21 +126,25 @@ include("header.php");
 	 * Valida o login:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	var ajax_div = $.ajax(null);
-	const logar = () => {
+	const cadastro = () => {
 		if (ajax_div) {
 			ajax_div.abort();
 		}
 		ajax_div = $.ajax({
 			cache: false,
 			async: true,
-			url: '?a=logar',
+			url: '?a=cadastrar',
 			type: 'post',
 			data: {
+                nome: $("#frm_nome").val(),
 				email: $("#frm_email").val(),
 				senha: $("#frm_password").val(),
+				cfmsenha: $("#frm_cfm_password").val(),
 			},
 			success: function retorno_ajax(retorno) {
+                console.log(retorno);
 				var obj = JSON.parse(retorno);
+				console.log(obj.success);
 				if(obj.success != undefined){
 					document.location.href="./home.php?uid="+obj.success;
 				}else{
@@ -134,6 +153,18 @@ include("header.php");
 			}
 		});
 	}
+
+    function validSenha(){
+        var senha = $("#frm_password").val();
+        var cfmsenha = $("#frm_cfm_password").val();
+        
+        if(senha != cfmsenha){
+            $("#btn_cad").attr("disabled", true);
+        }else{
+            $("#btn_cad").attr("disabled", false);
+        }
+
+    }
 </script>
 <!-- Github buttons -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>

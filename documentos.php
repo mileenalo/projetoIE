@@ -41,7 +41,7 @@ if (isset($_GET["a"])) {
         }
 
         $usuario = $_COOKIE["idUsuario"];
-
+        
         $res = $db->select("SELECT * FROM tb_documentos
                             INNER JOIN tb_categorias ON doc_categoria = cat_id
                             INNER JOIN tb_niveis ON doc_nivel = niv_id
@@ -123,7 +123,7 @@ if (isset($_GET["a"])) {
         $nivel = $_POST["nivel"];
         $datacad = date("Ymd");
 
-        $res = $db->_exec("INSERT INTO tb_documentos (doc_url, doc_categoria, doc_nivel, doc_desc, doc_usu, doc_datacad) 
+        $res = $db->_exec("INSERT INTO tb_documentos (doc_url, doc_categoria, doc_nivel, doc_desc, doc_usucad, doc_datacad) 
                             VALUES ('{$caminhoDestino}', {$categ}, {$nivel}, '{$desc}', {$usuario}, '{$datacad}')");
 
         echo $res;
@@ -175,6 +175,19 @@ if (isset($_GET["a"])) {
 
     }
 
+    if($_GET["a"] == "download"){
+        $arquivoPDF = 'caminho_do_arquivo.pdf'; // Caminho completo para o arquivo PDF
+
+        // Define o tipo de conteúdo como PDF
+        header('Content-Type: application/pdf');
+
+        // Força o download do arquivo com um nome específico
+        header('Content-Disposition: attachment; filename="nome_arquivo.pdf"');
+
+        // Envia o arquivo PDF para o navegador
+        readfile($arquivoPDF);
+    }
+    
     die();
 }
 
@@ -272,7 +285,7 @@ include('aside.php');
                             <div class="col-6">
                                 <label for="frm_val2_insert" class="form-label">Upload:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="file" class="form-control" id="frm_doc"  placeholder="Ex: material.pdf">
+                                    <input type="file" accept=".pdf" class="form-control" id="frm_doc"  placeholder="Ex: material.pdf">
                                 </div>
                             </div>
                         </div>
@@ -369,8 +382,10 @@ include('aside.php');
                 </div>
                 <div class="modal-body">
                     <div id="documentViewer" class="flowpaper_viewer"></div>
+                    <input type="text" id="frm_path_doc" hidden>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secundary" id="download" onclick="baixarArquivoPDF();"><img id="img_btn_download" style="width: 15px; display: none; margin-right: 10px">Baixar</button>
                     <button type="button" class="btn btn-primary" style="background:#DA522B;" id="OK" onclick="$('#mod_vis').modal('hide');"><img id="img_btn_close" style="width: 15px; display: none; margin-right: 10px">Fechar</button>
                 </div>
             </div>
@@ -555,8 +570,22 @@ include('aside.php');
         }
     }
     
+    function baixarArquivoPDF() {
+        var doc = $("#frm_path_doc").val();
+
+        var urlArquivoPDF = doc;
+        var nomeArquivo = "file_.pdf"; // O nome que deseja dar ao arquivo baixado
+
+        var link = document.createElement("a");
+        link.href = urlArquivoPDF;
+        link.download = nomeArquivo;
+
+        link.dispatchEvent(new MouseEvent("click"));
+    }
+
     function viewDoc(doc){
         $("#mod_vis").modal("show");
+        $("#frm_path_doc").val(doc);
         $('#documentViewer').FlowPaperViewer({
             config: {
                 PDFFile: doc,
