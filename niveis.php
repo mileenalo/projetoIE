@@ -29,25 +29,23 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Buscar conteúdo na div conteudo:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "lista_user") {
+    if ($_GET["a"] == "lista_niv") {
 
         $pesquisa = $_POST['pesq'];
         $where = "";
 
         if ($pesquisa != "") {
-            $where .= "WHERE usu_nome LIKE '%{$pesquisa}%' OR usu_email LIKE '%{$pesquisa}%'";
+            $where .= "WHERE niv_desc LIKE '%{$pesquisa}%' ";
         }
 
-        $res = $db->select("SELECT * FROM tb_usuarios
-                                {$where} ORDER BY usu_nome");
+        $res = $db->select("SELECT * FROM tb_niveis
+                                {$where} ORDER BY niv_desc");
 
         if (count($res) > 0) {
             echo '<table class="table align-items-center mb-0">';
             echo '  <thead>';
             echo '      <tr>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-left">Usuário</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">E-mail</th>';
-            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Permissão</th>';
+            echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-left">Nível</th>';
             echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Editar</th>';
             echo '          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-left">Deletar</th>';
             echo '      </tr>';
@@ -56,20 +54,13 @@ if (isset($_GET["a"])) {
             foreach($res as $r){
                 echo '<tr>';
                 echo '  <td class="align-middle text-left">';
-                echo '      <span class="text-secondary text-xs font-weight-bold" style="padding-left:15px;">'.$r["usu_nome"].'</span>';
-                echo '  </td>';
-                echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">'.$r["usu_email"].'</span>';
-                echo '  </td>';
-                $permissao = $r["usu_permissao"] == "1" ? "Administrador" : "Usuário";
-                echo '  <td class="align-middle text-left">';
-                echo '    <span class="text-secondary text-xs font-weight-bold">'.$permissao.'</span>';
+                echo '      <span class="text-secondary text-xs font-weight-bold" style="padding-left:15px;">'.$r["niv_desc"].'</span>';
                 echo '  </td>';
                 echo '  <td class="align-middle">';
-                echo '      <i title="Editar" onclick="get_item(\'' . $r["usu_id"] . '\')" class="fa fa-edit" style="cursor: pointer"></i>';
+                echo '      <i title="Editar" onclick="get_item(\'' . $r["niv_id"] . '\')" class="fa fa-edit" style="cursor: pointer"></i>';
                 echo '  </td>';
                 echo '  <td class="align-middle">';
-                echo '      <i title="Deletar" onclick="del_item(\'' . $r["usu_id"] . '\')" class="fa fa-trash" style="cursor: pointer"></i>';
+                echo '      <i title="Deletar" onclick="del_item(\'' . $r["niv_id"] . '\')" class="fa fa-trash" style="cursor: pointer"></i>';
                 echo '  </td>';
                 echo '</tr>';
             }
@@ -85,14 +76,11 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Inclusão de usuários:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "inclui_user") {
+    if ($_GET["a"] == "inclui_niv") {
 
-        $name = $_POST["name"];
-        $email = $_POST["email"];
-        $password = md5($_POST["password"]);
-        $permi = $_POST["permi"];
+        $desc = $_POST["desc"];
         
-        $res = $db->_exec("INSERT INTO tb_usuarios (usu_nome, usu_email, usu_senha, usu_permissao) VALUES ('{$name}','{$email}','{$password}', {$permi})");
+        $res = $db->_exec("INSERT INTO tb_niveis (niv_desc) VALUES ('{$desc}')");
 
         echo $res;
     }
@@ -100,15 +88,12 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Edição de usuários:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "edita_user") {
+    if ($_GET["a"] == "edita_niv") {
 
         $id = $_POST["id"];
-        $name = $_POST["name"];
-        $email = $_POST["email"];
-        $permi = $_POST["permi"];
-        $password = md5($_POST["password"]);
+        $desc = $_POST["desc"];
 
-        $res = $db->_exec("UPDATE tb_usuarios SET usu_nome = '{$name}', usu_email = '{$email}', usu_senha = '$password', usu_permissao = {$permi} WHERE usu_id = $id");
+        $res = $db->_exec("UPDATE tb_niveis SET niv_desc = '{$desc}' WHERE niv_id = $id");
 
         echo $res;
     }
@@ -117,11 +102,11 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Deleta o usuário:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "del_user") {
+    if ($_GET["a"] == "del_niv") {
 
         $id = $_POST["id"];
 
-        $del = $db->_exec("DELETE FROM tb_usuarios WHERE usu_id = {$id}");
+        $del = $db->_exec("DELETE FROM tb_niveis WHERE niv_id = {$id}");
 
         echo $del;
     }
@@ -129,17 +114,13 @@ if (isset($_GET["a"])) {
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     * Busca conteúdo para exibir na div de edição do usuário:
     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    if ($_GET["a"] == "get_user") {
+    if ($_GET["a"] == "get_niv") {
 
 
         $id = $_POST["id"];
 
-        $res = $db->select("SELECT * FROM tb_usuarios 
-                            WHERE usu_id = {$id}");
-
-        if (count($res) > 0) {
-            $res[0]['usu_nome'] = utf8_decode($res[0]['usu_nome']);
-        }
+        $res = $db->select("SELECT * FROM tb_niveis 
+                            WHERE niv_id = {$id}");
 
         echo json_encode($res);
     }
@@ -159,7 +140,7 @@ include('aside.php');
                 <div class="card my-4">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                         <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3" style="background:#DA522B;">
-                            <h6 class="text-white text-capitalize ps-3">Usuários</h6>
+                            <h6 class="text-white text-capitalize ps-3">Níveis</h6>
                         </div>
                     </div>
                     
@@ -194,7 +175,7 @@ include('aside.php');
                             <h2 style="margin: 0"><span class="badge bg-info text-white" style="padding: 8px" id="span_endereco_nome"></span></h2>
                         </div>
                         <div>
-                            <h5 id="tit_frm_formul" class="modal-title">Incluir Usuário</h5>
+                            <h5 id="tit_frm_formul" class="modal-title">Incluir Nível</h5>
                         </div>
                     </div>
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="$('#mod_formul').modal('hide');">X</button>
@@ -203,30 +184,9 @@ include('aside.php');
                     <form id="frm_general" name="frm_general" class="col">
                         <div class="row mb-3">
                             <div class="col-4">
-                                <label for="frm_val1_insert" class="form-label">Nome:</label>
+                                <label for="frm_nivel" class="form-label">Nível:</label>
                                 <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_nome" placeholder="Ex: Maria Luiza">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">E-mail:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_email" placeholder="Ex: teste@gmail.com">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">Senha:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="password" class="form-control" id="frm_password" placeholder="*****">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">Permissão:</label>
-                                <div class="input-group input-group-outline">
-                                    <select id="fil_permi" class="form-control form-control-lg" style="width:100%" name="fil_permi" type="text">
-								        <option value="1" selected>Administrador</option>
-                                        <option value="2">Usuário</option>
-							        </select>
+                                    <input type="text" class="form-control" id="frm_nivel" placeholder="Ex: Pós Graduação">
                                 </div>
                             </div>
                         </div>
@@ -251,7 +211,7 @@ include('aside.php');
                             <h2 style="margin: 0"><span class="badge bg-info text-white" style="padding: 8px" id="span_endereco_nome"></span></h2>
                         </div>
                         <div>
-                            <h5 id="div_edit_title">Editar Usuário</h5>
+                            <h5 id="div_edit_title">Editar Nível</h5>
                         </div>
                     </div>
                     <button type="button" style="cursor: pointer; border: 1px solid #ccc; border-radius: 10px" aria-label="Fechar" onclick="location.reload();">X</button>
@@ -260,31 +220,10 @@ include('aside.php');
                     <form id="frm_general" name="frm_general" class="col">
                         <div class="row mb-3">
                             <div class="col-4">
-                                <label for="frm_val1_insert" class="form-label">Nome:</label>
+                                <label for="frm_nivel_edit" class="form-label">Nível:</label>
                                 <div class="input-group input-group-outline">
                                     <input id="frm_id_edit" hidden>
-                                    <input type="text" class="form-control" id="frm_nome_edit" placeholder="Ex: Maria Luiza">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">E-mail:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" id="frm_email_edit" placeholder="Ex: teste@gmail.com">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">Senha:</label>
-                                <div class="input-group input-group-outline">
-                                    <input type="password" class="form-control" id="frm_password_edit" placeholder="*****">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label for="frm_val2_insert" class="form-label">Permissão:</label>
-                                <div class="input-group input-group-outline">
-                                    <select id="fil_permi_edit" class="form-control form-control-lg" style="width:100%" name="fil_permi_edit" type="text">
-								        <option value="1" selected>Administrador</option>
-                                        <option value="2">Usuário</option>
-							        </select>
+                                    <input type="text" class="form-control" id="frm_nivel_edit">
                                 </div>
                             </div>
                         </div>
@@ -311,7 +250,7 @@ include('aside.php');
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?a=lista_user',
+            url: '?a=lista_niv',
             type: 'post',
             data: {
                 pesq: $('#input_pesquisa').val()
@@ -337,18 +276,15 @@ include('aside.php');
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?a=inclui_user',
+            url: '?a=inclui_niv',
             type: 'post',
             data: {
-                name: $("#frm_nome").val(),
-                email: $("#frm_email").val(),
-                password: $("#frm_password").val(),
-                permi: $("#fil_permi").val(),
+                desc: $("#frm_nivel").val(),
             },
             success: function retorno_ajax(retorno) {
                 //console.log(retorno)
                 if (!retorno) {
-                    alert("ERRO AO INCLUIR USUÁRIO!");
+                    alert("ERRO AO INCLUIR NÍVEL!");
                 }else{
                     $("#mod_formul").modal('hide');
                     lista_itens();
@@ -363,7 +299,7 @@ include('aside.php');
     var ajax_div = $.ajax(null);
     const editUsu = (countarray, iditens, idPed) => {
 
-        if (confirm("Confirma a edição do usuário?")) {
+        if (confirm("Confirma a edição do Nível?")) {
             if (ajax_div) {
                 ajax_div.abort();
             }
@@ -371,13 +307,10 @@ include('aside.php');
             ajax_div = $.ajax({
                 cache: false,
                 async: true,
-                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=edita_user',
+                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=edita_niv',
                 type: 'post',
                 data: {
-                    name: $('#frm_nome_edit').val(),
-                    email: $('#frm_email_edit').val(),
-                    password: $('#frm_password_edit').val(),
-                    permi: $("#fil_permi_edit").val(),
+                    desc: $('#frm_nivel_edit').val(),
                     id: $('#frm_id_edit').val(),
                 },
                 beforeSend: function() {
@@ -385,7 +318,7 @@ include('aside.php');
                 },
                 success: function retorno_ajax(retorno) {
                     if (!retorno) {
-                        alert("ERRO AO EDITAR O USUÁRIO!");
+                        alert("ERRO AO EDITAR O NÍVEL!");
                     }else{
                         $('#mod_formul_edit').modal("hide");
                         lista_itens();
@@ -406,7 +339,7 @@ include('aside.php');
         ajax_div = $.ajax({
             cache: false,
             async: true,
-            url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=get_user',
+            url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=get_niv',
             type: 'post',
             data: {
                 id: id,
@@ -421,11 +354,7 @@ include('aside.php');
 
                 $("#frm_id_edit").val(id);
 
-                $("#frm_nome_edit").val(obj[0].usu_nome);
-                $("#frm_email_edit").val(obj[0].usu_email);
-                $("#fil_permi_edit").val(obj[0].usu_permissao);
-                //$("#frm_password_edit").val(obj_ret[0].idUsuario);
-
+                $("#frm_nivel_edit").val(obj[0].niv_desc);
             }
         });
     }
@@ -435,14 +364,14 @@ include('aside.php');
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     var ajax_div = $.ajax(null);
     function del_item(id) {
-        if (confirm("Deseja excluir o usuário?")) {
+        if (confirm("Deseja excluir o nível?")) {
             if (ajax_div) {
                 ajax_div.abort();
             }
             ajax_div = $.ajax({
                 cache: false,
                 async: true,
-                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=del_user',
+                url: '?uid=<?php echo $_COOKIE['idUsuario']; ?>&a=del_niv',
                 type: 'post',
                 data: {
                     id: id,

@@ -51,6 +51,26 @@
                     <span class="nav-link-text ms-1">Usuários</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-white " href="./categorias.php">
+                    
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">folder</i>
+                    </div>
+                    
+                    <span class="nav-link-text ms-1">Categorias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white " href="./niveis.php">
+                    
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">school</i>
+                    </div>
+                    
+                    <span class="nav-link-text ms-1">Níveis</span>
+                </a>
+            </li>
             <?php endif; ?>
         </ul>
         <div class="sidenav-footer position-absolute w-100 bottom-0 " style="margin-bottom: 10%;">
